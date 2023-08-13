@@ -3,7 +3,6 @@ package se.sbab.sbabchallenge.service;
 import okhttp3.*;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
-import se.sbab.sbabchallenge.model.LineResult;
 import se.sbab.sbabchallenge.model.LineStopsResult;
 import se.sbab.sbabchallenge.model.SLResponseObject;
 import se.sbab.sbabchallenge.model.StopsResult;
@@ -21,51 +20,6 @@ public class SLServiceTests {
     private final OkHttpClient client = mock(OkHttpClient.class);
     final Call remoteCall = mock(Call.class);
     private final SLService slService = new SLService(client);
-
-    @Test
-    public void shouldGetLinesAndMapOnRequest() throws IOException {
-        String expectedLines = """
-                {
-                    "StatusCode": 0,
-                    "Message": null,
-                    "ExecutionTime": 0,
-                    "ResponseData": {
-                        "Version": "2023-08-11 00:09",
-                        "Type": "Line",
-                        "Result": [
-                            {
-                                "LineNumber": "1",
-                                "LineDesignation": "1",
-                                "DefaultTransportMode": "blåbuss",
-                                "DefaultTransportModeCode": "BUS",
-                                "LastModifiedUtcDateTime": "2007-08-24 00:00:00.000",
-                                "ExistsFromDate": "2007-08-24 00:00:00.000"
-                            },
-                            {
-                                "LineNumber": "101",
-                                "LineDesignation": "101",
-                                "DefaultTransportMode": "",
-                                "DefaultTransportModeCode": "BUS",
-                                "LastModifiedUtcDateTime": "2023-06-08 00:00:00.000",
-                                "ExistsFromDate": "2023-06-08 00:00:00.000"
-                            }
-                        ]
-                    }
-                }
-                """;
-        Request mockRequest = new Request.Builder().get()
-                .url("https://api.sl.se/api2/LineData.json?model=line&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS")
-                .addHeader("Accept-Encoding","gzip, deflate")
-                .build();
-        Response response = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
-                .create(MediaType.get("application/json; charset=utf-8"),expectedLines))
-                .message("").protocol(Protocol.HTTP_2).build();
-        when(remoteCall.execute()).thenReturn(response);
-        when(client.newCall(any())).thenReturn(remoteCall);
-        SLResponseObject<LineResult> r = slService.getLines();
-        assert r.responseData().result().size() == 2;
-        assert r.responseData().result().get(0).lineNumber().equals(1);
-    }
 
     @Test
     public void shouldGetStopsAndMapOnRequest() throws IOException {
@@ -161,35 +115,6 @@ public class SLServiceTests {
 
     @Test
     public void shouldReturnTupleOfTop10AndListOfNames() throws IOException {
-        String expectedLines = """
-                {
-                    "StatusCode": 0,
-                    "Message": null,
-                    "ExecutionTime": 0,
-                    "ResponseData": {
-                        "Version": "2023-08-11 00:09",
-                        "Type": "Line",
-                        "Result": [
-                            {
-                                "LineNumber": "1",
-                                "LineDesignation": "1",
-                                "DefaultTransportMode": "blåbuss",
-                                "DefaultTransportModeCode": "BUS",
-                                "LastModifiedUtcDateTime": "2007-08-24 00:00:00.000",
-                                "ExistsFromDate": "2007-08-24 00:00:00.000"
-                            },
-                            {
-                                "LineNumber": "101",
-                                "LineDesignation": "101",
-                                "DefaultTransportMode": "",
-                                "DefaultTransportModeCode": "BUS",
-                                "LastModifiedUtcDateTime": "2023-06-08 00:00:00.000",
-                                "ExistsFromDate": "2023-06-08 00:00:00.000"
-                            }
-                        ]
-                    }
-                }
-                """;
         String expectedJourneys = """
                 {
                     "StatusCode": 0,
@@ -256,21 +181,17 @@ public class SLServiceTests {
                 .url("https://api.sl.se/api2/LineData.json?model=line&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS")
                 .addHeader("Accept-Encoding","gzip, deflate")
                 .build();
-        Response mockLineResponse = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
-                .create(MediaType.get("application/json; charset=utf-8"),expectedLines))
-                .message("").protocol(Protocol.HTTP_2).build();
         Response mockJourResponse = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
                 .create(MediaType.get("application/json; charset=utf-8"),expectedJourneys))
                 .message("").protocol(Protocol.HTTP_2).build();
         Response mockStopResponse = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
                         .create(MediaType.get("application/json; charset=utf-8"),expectedStops))
                 .message("").protocol(Protocol.HTTP_2).build();
-        when(remoteCall.execute()).thenReturn(mockLineResponse)
-                .thenReturn(mockJourResponse)
+        when(remoteCall.execute()).thenReturn(mockJourResponse)
                 .thenReturn(mockStopResponse);
         when(client.newCall(any())).thenReturn(remoteCall);
         Pair<HashMap<Integer, Integer>, List<String>> result = slService.mapLinesToStops();
-        assert result.getValue0().size()==2;
+        assert result.getValue0().size()==1;
         assert result.getValue1().size()==2;
 
 

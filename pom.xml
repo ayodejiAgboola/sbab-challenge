@@ -41,6 +41,11 @@
 			<artifactId>javatuples</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -102,7 +107,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>0.85</minimum>
 										</limit>
 									</limits>
 								</rule>

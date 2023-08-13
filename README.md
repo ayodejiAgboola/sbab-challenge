@@ -11,21 +11,21 @@ cd ./target
 java -jar .\sbab-challenge-0.0.1-SNAPSHOT.jar
 ```
 
+Alternatively, you can load the project into IntelliJ and run the main method in the class SbabChallengeApplication
+
 ## Testing
-Test coverage at 85% excluding models and configuration
+Test coverage at 89% excluding models and configuration
 A mock client was used within the test cases.
 
 ## External Dependencies
-This project uses 3 datapoints from Trafiklab’s SL API:
-1. Lines API: This endpoint is used to fetch all Bus lines  
-2. Stops API: This endpoint is used to fetch all Bus stops
-3. Journeys API: This endpoint contains the mapping of lines to stops. It shows a list of all lines and all the stops they reach.
+This project uses 2 datapoints from Trafiklab’s SL API:
+1. Stops API: This endpoint is used to fetch all Bus stops
+2. Journeys API: This endpoint contains the mapping of lines to stops. It shows a list of all lines and all the stops they reach.
 
 ## How it works
-1. Fetch line data
-2. Fetch journey data
-3. Create map of line->count(stops)
-4. Sort map and take top 10 elements
-5. Fetch Stop data
-6. Get stop names by filtering stop data on journey.stopid=stop.id
-7. Load map and list of names into tuple and return tuple
+1. Fetch journey data
+2. Create map of line->count(stops)
+3. Sort map and take top 10 elements
+4. Fetch Stop data
+5. Get stop names by filtering stop data on journey.stopid=stop.id
+6. Load map and list of names into tuple and return tuple

@@ -6,14 +6,12 @@ import okhttp3.*;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import se.sbab.sbabchallenge.model.LineResult;
 import se.sbab.sbabchallenge.model.LineStopsResult;
 import se.sbab.sbabchallenge.model.SLResponseObject;
 import se.sbab.sbabchallenge.model.StopsResult;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SLService {
@@ -29,16 +27,17 @@ public class SLService {
 
     public Pair<HashMap<Integer, Integer>, List<String>> mapLinesToStops(){
         HashMap <Integer, List<LineStopsResult>> lineStopsMap = new HashMap<>();
-        SLResponseObject<LineResult> lines = getLines();
         SLResponseObject<LineStopsResult> lineStopsResult = getLineStops();
-        assert lines != null;
-        List<LineResult> lineList = lines.responseData().result();
         assert lineStopsResult != null;
         List<LineStopsResult> lineStopList = lineStopsResult.responseData().result();
-        for (LineResult line:lineList) {
-            List<LineStopsResult> lineStops = lineStopList.stream()
-                    .filter((s)->s.lineNumber().equals(line.lineNumber())).collect(Collectors.toList());
-            lineStopsMap.put(line.lineNumber(),lineStops);
+        for (LineStopsResult lineStopResult: lineStopList){
+            if(lineStopsMap.containsKey(lineStopResult.lineNumber())){
+                List<LineStopsResult>  temp = lineStopsMap.get(lineStopResult.lineNumber());
+                temp.add(lineStopResult);
+                lineStopsMap.put(lineStopResult.lineNumber(), temp);
+            }else {
+                lineStopsMap.put(lineStopResult.lineNumber(), new ArrayList<>(Arrays.asList(lineStopResult)));
+            }
         }
         HashMap<Integer, Integer> sortedMap = sortMapByValues(lineStopsMap);
         int index = 10;
@@ -75,16 +74,6 @@ public class SLService {
             result.put(entry.getKey(),entry.getValue().size());
         }
         return result;
-    }
-
-    public SLResponseObject<LineResult> getLines(){
-        Request req = new Request.Builder().get().url(LINE_URL).addHeader("Accept-Encoding","gzip, deflate").build();
-        try (Response response = client.newCall(req).execute()){
-            return objectMapper.readValue(response.body().string(), new TypeReference<>() {});
-        }catch (IOException e){
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public SLResponseObject<LineStopsResult> getLineStops(){
