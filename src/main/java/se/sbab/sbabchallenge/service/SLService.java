@@ -17,12 +17,13 @@ import java.util.*;
 public class SLService {
     private final OkHttpClient client;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String LINE_URL="https://api.sl.se/api2/LineData.json?model=line&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS";
-    private final String JOUR_URL="https://api.sl.se/api2/LineData.json?model=jour&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS";
-    private final String STOP_URL="https://api.sl.se/api2/LineData.json?model=stop&key=5da196d47f8f4e5facdb68d2e25b9eae";
+    private String JOUR_URL;
+    private String STOP_URL;
 
-    public SLService(OkHttpClient client) {
+    public SLService(OkHttpClient client, @Value("${url.jour}") String jour, @Value("${url.stop}")String stop) {
         this.client = client;
+        JOUR_URL = jour;
+        STOP_URL = stop;
     }
 
     public Pair<HashMap<Integer, Integer>, List<String>> mapLinesToStops(){

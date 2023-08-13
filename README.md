@@ -29,3 +29,7 @@ This project uses 2 datapoints from Trafiklab’s SL API:
 4. Fetch Stop data
 5. Get stop names by filtering stop data on journey.stopid=stop.id
 6. Load map and list of names into tuple and return tuple
+
+## Notes
+1. Not all stops on the line with the highest number of stops have a corresponding Stop object on the Stops API.
+2. I am working with the assumption that there aren't any duplicate stops on a line.

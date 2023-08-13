@@ -19,7 +19,9 @@ import static org.mockito.Mockito.when;
 public class SLServiceTests {
     private final OkHttpClient client = mock(OkHttpClient.class);
     final Call remoteCall = mock(Call.class);
-    private final SLService slService = new SLService(client);
+    private final String STOP_URL = "https://api.sl.se/api2/LineData.json?model=stop&key=5da196d47f8f4e5facdb68d2e25b9eae";
+    private final String JOUR_URL = "https://api.sl.se/api2/LineData.json?model=jour&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS";
+    private final SLService slService = new SLService(client, JOUR_URL, STOP_URL);
 
     @Test
     public void shouldGetStopsAndMapOnRequest() throws IOException {
@@ -59,7 +61,7 @@ public class SLServiceTests {
                 }
                 """;
         Request mockRequest = new Request.Builder().get()
-                .url("https://api.sl.se/api2/LineData.json?model=stop&key=5da196d47f8f4e5facdb68d2e25b9eae")
+                .url(STOP_URL)
                 .addHeader("Accept-Encoding","gzip, deflate")
                 .build();
         Response response = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
@@ -101,7 +103,7 @@ public class SLServiceTests {
                 }
                 """;
         Request mockRequest = new Request.Builder().get()
-                .url("https://api.sl.se/api2/LineData.json?model=jour&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS")
+                .url(JOUR_URL)
                 .addHeader("Accept-Encoding","gzip, deflate")
                 .build();
         Response response = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
@@ -192,7 +194,11 @@ public class SLServiceTests {
         when(client.newCall(any())).thenReturn(remoteCall);
         Pair<HashMap<Integer, Integer>, List<String>> result = slService.mapLinesToStops();
         assert result.getValue0().size()==1;
+        assert result.getValue0().containsKey(1);
+        assert result.getValue0().get(1).equals(2);
         assert result.getValue1().size()==2;
+        assert result.getValue1().contains("Stadshagsplan");
+        assert result.getValue1().contains("John Bergs plan");
 
 
     }
