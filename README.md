@@ -14,7 +14,8 @@ java -jar .\sbab-challenge-0.0.1-SNAPSHOT.jar
 Alternatively, you can load the project into IntelliJ and run the main method in the class SbabChallengeApplication
 
 ## Testing
-Test coverage at 89% excluding models and configuration
+Test coverage at 99% excluding models and configuration
+
 A mock client was used within the test cases.
 
 ## External Dependencies
