@@ -30,7 +30,6 @@ public class SLService {
         //Create map of line to list of stops
         HashMap <Integer, List<LineStopsResult>> lineStopsMap = new HashMap<>();
         SLResponseObject<LineStopsResult> lineStopsResult = getLineStops();
-        assert lineStopsResult != null;
         List<LineStopsResult> lineStopList = lineStopsResult.responseData().result();
         for (LineStopsResult lineStopResult: lineStopList){
             if(lineStopsMap.containsKey(lineStopResult.lineNumber())){
@@ -52,7 +51,6 @@ public class SLService {
 
     private List<String> getStopNames(List<LineStopsResult> lineStopList){
         SLResponseObject<StopsResult> stops = getStops();
-        assert stops != null;
         List<StopsResult> stopsList = stops.responseData().result();
         List<StopsResult> validStops = stopsList.stream().filter(v->lineStopList.stream()
                 .anyMatch(k->v.stopPointNumber().equals(k.journeyPatternPointNumber()))).toList();
@@ -73,8 +71,9 @@ public class SLService {
     public SLResponseObject<LineStopsResult> getLineStops(){
         Request req = new Request.Builder().get().url(JOUR_URL).addHeader("Accept-Encoding","gzip, deflate").build();
         try (Response response = client.newCall(req).execute()){
+            assert response.body() != null;
             return objectMapper.readValue(response.body().string(), new TypeReference<>() {});
-        }catch (IOException e){
+        }catch (Exception e){
             e.printStackTrace();
             return null;
         }
@@ -83,8 +82,9 @@ public class SLService {
     public SLResponseObject<StopsResult> getStops(){
         Request req = new Request.Builder().get().url(STOP_URL).addHeader("Accept-Encoding","gzip, deflate").build();
         try (Response response = client.newCall(req).execute()){
+            assert response.body() != null;
             return objectMapper.readValue(response.body().string(), new TypeReference<>() {});
-        }catch (IOException e){
+        }catch (Exception e){
             e.printStackTrace();
             return null;
         }

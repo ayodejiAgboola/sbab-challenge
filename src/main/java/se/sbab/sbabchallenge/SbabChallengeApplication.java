@@ -17,8 +17,8 @@ public class SbabChallengeApplication {
 	public static void main(String[] args) {
 
 		ApplicationContext context = SpringApplication.run(SbabChallengeApplication.class, args);
-		SLService s = context.getBean(SLService.class);
-		Pair<HashMap<Integer, Integer>, List<String>> result = s.getSortedMapAndStopNames();
+		SLService slService = context.getBean(SLService.class);
+		Pair<HashMap<Integer, Integer>, List<String>> result = slService.getSortedMapAndStopNames();
 		HashMap<Integer, Integer> sortedMap = result.getValue0();
 		List<String> stopNames = result.getValue1();
 		int top10 = 10;
