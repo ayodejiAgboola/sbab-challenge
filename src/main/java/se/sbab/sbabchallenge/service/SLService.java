@@ -30,6 +30,9 @@ public class SLService {
         //Create map of line to list of stops
         HashMap <Integer, List<LineStopsResult>> lineStopsMap = new HashMap<>();
         SLResponseObject<LineStopsResult> lineStopsResult = getLineStops();
+        if(lineStopsResult == null){
+            return Pair.with(new HashMap<>(), new ArrayList<>());
+        }
         List<LineStopsResult> lineStopList = lineStopsResult.responseData().result();
         for (LineStopsResult lineStopResult: lineStopList){
             if(lineStopsMap.containsKey(lineStopResult.lineNumber())){
@@ -51,6 +54,9 @@ public class SLService {
 
     private List<String> getStopNames(List<LineStopsResult> lineStopList){
         SLResponseObject<StopsResult> stops = getStops();
+        if(stops == null){
+            return new ArrayList<>();
+        }
         List<StopsResult> stopsList = stops.responseData().result();
         List<StopsResult> validStops = stopsList.stream().filter(v->lineStopList.stream()
                 .anyMatch(k->v.stopPointNumber().equals(k.journeyPatternPointNumber()))).toList();

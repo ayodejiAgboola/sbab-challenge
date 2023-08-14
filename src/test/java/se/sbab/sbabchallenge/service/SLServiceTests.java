@@ -203,4 +203,68 @@ public class SLServiceTests {
 
     }
 
+    @Test
+    public void shouldReturnEmptyOnFailedCall() throws IOException {
+
+        Request mockRequest = new Request.Builder().get()
+                .url("https://api.sl.se/api2/LineData.json?model=line&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS")
+                .addHeader("Accept-Encoding","gzip, deflate")
+                .build();
+        when(remoteCall.execute()).thenThrow(IOException.class);
+        when(client.newCall(any())).thenReturn(remoteCall);
+        Pair<HashMap<Integer, Integer>, List<String>> result = slService.getSortedMapAndStopNames();
+        assert result.getValue0().size()==0;
+        assert result.getValue1().size()==0;
+
+
+    }
+
+    @Test
+    public void shouldReturnTupleOfTop10AndEmptyList() throws IOException {
+        String expectedJourneys = """
+                {
+                    "StatusCode": 0,
+                    "Message": null,
+                    "ExecutionTime": 0,
+                    "ResponseData": {
+                        "Version": "2023-08-11 00:09",
+                        "Type": "JourneyPatternPointOnLine",
+                        "Result": [
+                            {
+                                  "LineNumber": "1",
+                                  "DirectionCode": "1",
+                                  "JourneyPatternPointNumber": "10001",
+                                  "LastModifiedUtcDateTime": "2022-02-15 00:00:00.000",
+                                  "ExistsFromDate": "2022-02-15 00:00:00.000"
+                              },
+                              {
+                                  "LineNumber": "1",
+                                  "DirectionCode": "1",
+                                  "JourneyPatternPointNumber": "10002",
+                                  "LastModifiedUtcDateTime": "2023-03-07 00:00:00.000",
+                                  "ExistsFromDate": "2023-03-07 00:00:00.000"
+                              }
+                        ]
+                    }
+                }
+                """;
+        Request mockRequest = new Request.Builder().get()
+                .url("https://api.sl.se/api2/LineData.json?model=line&key=5da196d47f8f4e5facdb68d2e25b9eae&DefaultTransportModeCode=BUS")
+                .addHeader("Accept-Encoding","gzip, deflate")
+                .build();
+        Response mockJourResponse = new Response.Builder().request(mockRequest).code(200).body(ResponseBody
+                        .create(MediaType.get("application/json; charset=utf-8"),expectedJourneys))
+                .message("").protocol(Protocol.HTTP_2).build();
+        when(remoteCall.execute()).thenReturn(mockJourResponse)
+                .thenThrow(IOException.class);
+        when(client.newCall(any())).thenReturn(remoteCall);
+        Pair<HashMap<Integer, Integer>, List<String>> result = slService.getSortedMapAndStopNames();
+        assert result.getValue0().size()==1;
+        assert result.getValue0().containsKey(1);
+        assert result.getValue0().get(1).equals(2);
+        assert result.getValue1().size()==0;
+
+
+    }
+
 }

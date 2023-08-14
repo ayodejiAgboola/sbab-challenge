@@ -19,8 +19,11 @@ public class SbabChallengeApplication {
 		ApplicationContext context = SpringApplication.run(SbabChallengeApplication.class, args);
 		SLService slService = context.getBean(SLService.class);
 		Pair<HashMap<Integer, Integer>, List<String>> result = slService.getSortedMapAndStopNames();
+		if(result.getValue0().isEmpty()){
+			System.err.println("No results from Journey API");
+			System.exit(99);
+		}
 		HashMap<Integer, Integer> sortedMap = result.getValue0();
-		List<String> stopNames = result.getValue1();
 		int top10 = 10;
 		System.out.println("Bus lines with the 10 highest stops are: ");
 		Iterator<Map.Entry<Integer, Integer>> iterator = sortedMap.entrySet().iterator();
@@ -29,6 +32,11 @@ public class SbabChallengeApplication {
 			System.out.println("Bus line= "+entry.getKey()+"-> Bus stops="+entry.getValue());
 			top10--;
 		}
+		if(result.getValue1().isEmpty()){
+			System.err.println("No results from Stops API");
+			System.exit(99);
+		}
+		List<String> stopNames = result.getValue1();
 		System.out.println("List of stops for largest line: "+stopNames);
 	}
 
