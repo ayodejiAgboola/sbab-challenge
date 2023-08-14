@@ -17,8 +17,8 @@ import java.util.*;
 public class SLService {
     private final OkHttpClient client;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private String JOUR_URL;
-    private String STOP_URL;
+    private final String JOUR_URL;
+    private final String STOP_URL;
 
     public SLService(OkHttpClient client, @Value("${url.jour}") String jour, @Value("${url.stop}")String stop) {
         this.client = client;
@@ -26,7 +26,8 @@ public class SLService {
         STOP_URL = stop;
     }
 
-    public Pair<HashMap<Integer, Integer>, List<String>> mapLinesToStops(){
+    public Pair<HashMap<Integer, Integer>, List<String>> getSortedMapAndStopNames(){
+        //Create map of line to list of stops
         HashMap <Integer, List<LineStopsResult>> lineStopsMap = new HashMap<>();
         SLResponseObject<LineStopsResult> lineStopsResult = getLineStops();
         assert lineStopsResult != null;
@@ -40,21 +41,13 @@ public class SLService {
                 lineStopsMap.put(lineStopResult.lineNumber(), new ArrayList<>(Arrays.asList(lineStopResult)));
             }
         }
+        //Sort the map
         HashMap<Integer, Integer> sortedMap = sortMapByValues(lineStopsMap);
-        int index = 10;
-        List<String> stopNames = new ArrayList<>();
-        HashMap<Integer, Integer> top10Map = new HashMap<>();
-        Iterator<Map.Entry<Integer, Integer>> iterator = sortedMap.entrySet().iterator();
-        while (iterator.hasNext()&&index>0){
-            Map.Entry<Integer, Integer> entry = iterator.next();
-            top10Map.put(entry.getKey(),entry.getValue());
-            //Fetch names for line with highest stops
-            if(index == 10)
-                stopNames = getStopNames(lineStopsMap.get(entry.getKey()));
-            index --;
-        }
+        Map.Entry<Integer, Integer> first = sortedMap.entrySet().iterator().next();
+        //Fetch names for line with highest stops
+        List<String> stopNames = getStopNames(lineStopsMap.get(first.getKey()));
         //Return tuple with sorted and filtered map and list of names
-        return Pair.with(top10Map,stopNames);
+        return Pair.with(sortedMap,stopNames);
     }
 
     private List<String> getStopNames(List<LineStopsResult> lineStopList){

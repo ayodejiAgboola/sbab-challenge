@@ -192,7 +192,7 @@ public class SLServiceTests {
         when(remoteCall.execute()).thenReturn(mockJourResponse)
                 .thenReturn(mockStopResponse);
         when(client.newCall(any())).thenReturn(remoteCall);
-        Pair<HashMap<Integer, Integer>, List<String>> result = slService.mapLinesToStops();
+        Pair<HashMap<Integer, Integer>, List<String>> result = slService.getSortedMapAndStopNames();
         assert result.getValue0().size()==1;
         assert result.getValue0().containsKey(1);
         assert result.getValue0().get(1).equals(2);
